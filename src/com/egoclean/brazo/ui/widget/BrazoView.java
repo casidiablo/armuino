@@ -1,15 +1,16 @@
 package com.egoclean.brazo.ui.widget;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
+import android.graphics.*;
+import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import com.egoclean.brazo.calc.ArmsAngles;
 import com.egoclean.brazo.calc.InverseCinematic;
+
+import java.text.DecimalFormat;
 
 /**
  * @author cristian
@@ -18,10 +19,14 @@ public class BrazoView extends View {
     private final int mOriginArmAngle = -90;
     private static final int PADDING = 10;
 
+    private static final DecimalFormat FORMATTER = new DecimalFormat("#.#\u00ba");
+
     private final Paint mArmPaint;
     private final Paint mClickPaint;
     private final Paint mAreaPaint;
     private final Paint mEmptyPaint;
+    private final Paint mBoxPaint;
+    private final TextPaint mTextPaint;
     private boolean mDrawArea = true;
     private float mClickX;
     private float mClickY;
@@ -45,6 +50,15 @@ public class BrazoView extends View {
 
         mEmptyPaint = new Paint(mArmPaint);
         mEmptyPaint.setColor(Color.parseColor("#cccccc"));
+
+        mBoxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mBoxPaint.setColor(Color.BLACK);
+        mBoxPaint.setAlpha(180);
+
+        mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mTextPaint.setTextSize(20);
+        mTextPaint.setColor(Color.WHITE);
+        mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
     }
 
     @Override
@@ -56,12 +70,12 @@ public class BrazoView extends View {
 
         drawArea(canvas);
 
-//        mClickX = getWidth() / 2 + 90;
-//        mClickY = originY + 80;// 170
-        ArmsAngles angles = InverseCinematic.calculateAngles(mClickX- getWidth() / 2, originY - mClickY, armSize);
+        ArmsAngles angles = InverseCinematic.calculateAngles(mClickX - getWidth() / 2, originY - mClickY, armSize);
         if (angles != null) {
             mForearmAngle = (int) angles.getForeArmAngleDegrees();
             mArmAngle = (int) angles.getArmAngleDegrees();
+        } else {
+            performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
 
         if (mForearmAngle > 180) {
@@ -96,8 +110,21 @@ public class BrazoView extends View {
 
         // draw point
         if (mClickY < auxiliarAreaY) {
-            canvas.drawPoint(mClickX,  mClickY, mClickPaint);
+            canvas.drawPoint(mClickX, mClickY, mClickPaint);
         }
+
+        // draw text container
+        RectF rect = new RectF(0, 0, getWidth() / 2, getWidth() / 6);
+        float boxX = getWidth() / 2 - rect.right / 2;
+        float boxY = originY + PADDING;
+        canvas.translate(boxX, boxY);
+        canvas.drawRoundRect(rect, 15, 15, mBoxPaint);
+        String servo1 = "Servo1: " + (angles == null ? "NPI" : FORMATTER.format(angles.getForeArmAngleDegrees()));
+        String servo2 = "Servo2: " + (angles == null ? "NPI" : FORMATTER.format(angles.getArmAngleDegrees()));
+        canvas.drawText(servo1, PADDING, mTextPaint.measureText("Xy"), mTextPaint);
+        canvas.drawText(servo2, PADDING, mTextPaint.measureText("Xy") * 2, mTextPaint);
+        canvas.translate(-boxX, -boxY);
+
     }
 
     private int calcOriginY() {
