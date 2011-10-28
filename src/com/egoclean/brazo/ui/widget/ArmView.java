@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 /**
  * @author cristian
  */
-public class BrazoView extends View {
+public class ArmView extends View {
     private final int mOriginArmAngle = -90;
     private static final int PADDING = 10;
 
@@ -33,7 +33,9 @@ public class BrazoView extends View {
     private int mForearmAngle;
     private int mArmAngle;
 
-    public BrazoView(Context context, AttributeSet attrs) {
+    private AngleListener mAngleListener;
+
+    public ArmView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mArmPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mArmPaint.setColor(Color.DKGRAY);
@@ -121,6 +123,10 @@ public class BrazoView extends View {
         canvas.drawRoundRect(rect, 15, 15, mBoxPaint);
         String servo1 = "Servo1: " + (angles == null ? "NPI" : FORMATTER.format(angles.getForeArmAngleDegrees()));
         String servo2 = "Servo2: " + (angles == null ? "NPI" : FORMATTER.format(angles.getArmAngleDegrees()));
+        if (angles != null && mAngleListener != null) {
+            mAngleListener.onAnglesChanged(angles.getForeArmAngleDegrees(), angles.getArmAngleDegrees(),
+                    0f);
+        }
         canvas.drawText(servo1, PADDING, mTextPaint.measureText("Xy"), mTextPaint);
         canvas.drawText(servo2, PADDING, mTextPaint.measureText("Xy") * 2, mTextPaint);
         canvas.translate(-boxX, -boxY);
@@ -191,5 +197,13 @@ public class BrazoView extends View {
         canvas.drawLine(0, 0, length, 0, mArmPaint);
         canvas.rotate(angle);
         canvas.translate(-x, -y);
+    }
+
+    public void setAngleListener(AngleListener angleListener) {
+        mAngleListener = angleListener;
+    }
+
+    public interface AngleListener {
+        void onAnglesChanged(float foreArm, float arm, float hand);
     }
 }

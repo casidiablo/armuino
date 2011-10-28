@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<com.egoclean.brazo.ui.widget.ArmView
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
+        android:id="@+id/arm_view"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-    <fragment
-            android:name="com.egoclean.brazo.ui.BrazoFragment"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"/>
-</LinearLayout>
-
+        android:layout_height="fill_parent"
+        android:background="#cccccc"/>
