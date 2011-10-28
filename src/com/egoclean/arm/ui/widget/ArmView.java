@@ -14,7 +14,7 @@
  *   0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-package com.egoclean.brazo.ui.widget;
+package com.egoclean.arm.ui.widget;
 
 import android.content.Context;
 import android.graphics.*;
@@ -29,9 +29,9 @@ import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.Tweenable;
 import aurelienribon.tweenengine.equations.Linear;
-import com.egoclean.brazo.R;
-import com.egoclean.brazo.calc.ArmsAngles;
-import com.egoclean.brazo.calc.InverseCinematic;
+import com.egoclean.arm.R;
+import com.egoclean.arm.calc.ArmsAngles;
+import com.egoclean.arm.calc.InverseCinematic;
 
 import java.text.DecimalFormat;
 

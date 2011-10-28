@@ -14,7 +14,7 @@
  *   0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-package com.egoclean.brazo.ui;
+package com.egoclean.arm.ui;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -28,9 +28,9 @@ import android.os.ParcelFileDescriptor;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
-import com.egoclean.brazo.R;
-import com.egoclean.brazo.adk.OutputController;
-import com.egoclean.brazo.ui.widget.ArmView;
+import com.egoclean.arm.R;
+import com.egoclean.arm.adk.OutputController;
+import com.egoclean.arm.ui.widget.ArmView;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -39,7 +39,7 @@ import java.io.IOException;
 
 public class ArmActivity extends FragmentActivity {
     private static final String TAG = "ArmActivity";
-    private static final String ACTION_USB_PERMISSION = "com.egoclean.brazo.action.USB_PERMISSION";
+    private static final String ACTION_USB_PERMISSION = "com.egoclean.arm.action.USB_PERMISSION";
 
     private UsbManager mUsbManager;
     private PendingIntent mPermissionIntent;

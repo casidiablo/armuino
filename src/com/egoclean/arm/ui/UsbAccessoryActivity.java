@@ -14,7 +14,7 @@
  *   0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-package com.egoclean.brazo.ui;
+package com.egoclean.arm.ui;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;

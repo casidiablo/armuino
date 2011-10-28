@@ -14,9 +14,9 @@
  *   0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-package com.egoclean.brazo.adk;
+package com.egoclean.arm.adk;
 
-import com.egoclean.brazo.ui.ArmActivity;
+import com.egoclean.arm.ui.ArmActivity;
 
 class ServoController {
 	private final byte mCommandTarget;

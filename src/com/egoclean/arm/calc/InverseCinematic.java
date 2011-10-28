@@ -14,7 +14,7 @@
  *   0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-package com.egoclean.brazo.calc;
+package com.egoclean.arm.calc;
 
 /**
  * @author cristian
