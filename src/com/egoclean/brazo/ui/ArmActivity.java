@@ -20,7 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class ArmActivity extends FragmentActivity implements Runnable {
+public class ArmActivity extends FragmentActivity {
     private static final String TAG = "ArmActivity";
     private static final String ACTION_USB_PERMISSION = "com.egoclean.brazo.action.USB_PERMISSION";
 
@@ -93,11 +93,6 @@ public class ArmActivity extends FragmentActivity implements Runnable {
         super.onDestroy();
     }
 
-    @Override
-    public void run() {
-        System.out.println("::::::: run");
-    }
-
     private void openAccessory(UsbAccessory accessory) {
         mFileDescriptor = mUsbManager.openAccessory(accessory);
         if (mFileDescriptor != null) {
@@ -105,8 +100,6 @@ public class ArmActivity extends FragmentActivity implements Runnable {
             FileDescriptor fd = mFileDescriptor.getFileDescriptor();
             mInputStream = new FileInputStream(fd);
             mOutputStream = new FileOutputStream(fd);
-            Thread thread = new Thread(null, this, "DemoKit");
-            thread.start();
             Log.d(TAG, "accessory opened");
         } else {
             Log.d(TAG, "accessory open fail");
@@ -126,7 +119,6 @@ public class ArmActivity extends FragmentActivity implements Runnable {
     }
 
     public void sendCommand(byte command, byte target, int value) {
-        System.out.println("::::: sending command "+command+", "+target+", "+value);
         byte[] buffer = new byte[3];
         if (value > 255)
             value = 255;

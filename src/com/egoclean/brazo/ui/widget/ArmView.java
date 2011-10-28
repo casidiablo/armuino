@@ -2,11 +2,18 @@ package com.egoclean.brazo.ui.widget;
 
 import android.content.Context;
 import android.graphics.*;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.Tweenable;
+import aurelienribon.tweenengine.equations.Linear;
+import com.egoclean.brazo.R;
 import com.egoclean.brazo.calc.ArmsAngles;
 import com.egoclean.brazo.calc.InverseCinematic;
 
@@ -30,17 +37,31 @@ public class ArmView extends View {
     private boolean mDrawArea = true;
     private float mClickX;
     private float mClickY;
-    private int mForearmAngle;
-    private int mArmAngle;
+
+    private int mForearmAngle = 90;
+    private int mArmAngle = 90;
+    private HandTween mHandTween;
 
     private AngleListener mAngleListener;
+
+    private boolean mRaised = true;
+    private boolean mRefresh = true;
+    private Bitmap mRaisedHand;
+    private Bitmap mDownHand;
+
+    private String mPreviousForeArm;
+    private String mPreviousArm;
+
+    private float mPointX;
+    private float mPointY;
+    private TweenManager mTweenManager;
 
     public ArmView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mArmPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mArmPaint.setColor(Color.DKGRAY);
         mArmPaint.setAlpha(150);
-        mArmPaint.setStrokeWidth(10);
+        mArmPaint.setStrokeWidth(40);
         mArmPaint.setStrokeCap(Paint.Cap.ROUND);
 
         mClickPaint = new Paint(mArmPaint);
@@ -51,7 +72,7 @@ public class ArmView extends View {
         mAreaPaint.setAlpha(50);
 
         mEmptyPaint = new Paint(mArmPaint);
-        mEmptyPaint.setColor(Color.parseColor("#cccccc"));
+        mEmptyPaint.setColor(Color.WHITE);
 
         mBoxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mBoxPaint.setColor(Color.BLACK);
@@ -61,11 +82,28 @@ public class ArmView extends View {
         mTextPaint.setTextSize(20);
         mTextPaint.setColor(Color.WHITE);
         mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+
+        mRaisedHand = BitmapFactory.decodeResource(getResources(), R.drawable.raised_hand);
+        mDownHand = BitmapFactory.decodeResource(getResources(), R.drawable.down_hand);
+
+        mTweenManager = new TweenManager();
+        mHandTween = new HandTween();
+        mTickHandler.sendMessage(Message.obtain());
     }
+
+    private Handler mTickHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            mTweenManager.update();
+            mTickHandler.sendMessageDelayed(Message.obtain(), 10);
+        }
+    };
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        canvas.drawColor(Color.WHITE);
         int armSize = calcArmSize();
         int originX = getWidth() / 2;
         int originY = calcOriginY();
@@ -74,8 +112,16 @@ public class ArmView extends View {
 
         ArmsAngles angles = InverseCinematic.calculateAngles(mClickX - getWidth() / 2, originY - mClickY, armSize);
         if (angles != null) {
-            mForearmAngle = (int) angles.getForeArmAngleDegrees();
-            mArmAngle = (int) angles.getArmAngleDegrees();
+            if (mRefresh) {
+                int foreArmAngleDegrees = (int) angles.getForeArmAngleDegrees();
+                if (foreArmAngleDegrees > 0 && foreArmAngleDegrees <= 180) {
+                    mForearmAngle = foreArmAngleDegrees;
+                }
+                int armAngleDegrees = (int) angles.getArmAngleDegrees();
+                if (armAngleDegrees > 0 && armAngleDegrees <= 180) {
+                    mArmAngle = armAngleDegrees;
+                }
+            }
         } else {
             performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
@@ -111,8 +157,12 @@ public class ArmView extends View {
         canvas.translate(0, -auxiliarAreaY);
 
         // draw point
-        if (mClickY < auxiliarAreaY) {
-            canvas.drawPoint(mClickX, mClickY, mClickPaint);
+        if (mClickY < auxiliarAreaY && mClickX > 0 && mClickY > 0) {
+            if (mRefresh || (mPointX == 0 && mPointY == 0)) {
+                mPointX = mClickX;
+                mPointY = mClickY;
+            }
+            canvas.drawPoint(mPointX, mPointY, mClickPaint);
         }
 
         // draw text container
@@ -121,16 +171,47 @@ public class ArmView extends View {
         float boxY = originY + PADDING;
         canvas.translate(boxX, boxY);
         canvas.drawRoundRect(rect, 15, 15, mBoxPaint);
-        String servo1 = "Servo1: " + (angles == null ? "NPI" : FORMATTER.format(angles.getForeArmAngleDegrees()));
-        String servo2 = "Servo2: " + (angles == null ? "NPI" : FORMATTER.format(angles.getArmAngleDegrees()));
-        if (angles != null && mAngleListener != null) {
-            mAngleListener.onAnglesChanged(angles.getForeArmAngleDegrees(), angles.getArmAngleDegrees(),
-                    0f);
+        if (mRefresh) {
+            mPreviousForeArm = angles == null ? "NPI" : FORMATTER.format(mForearmAngle);
+            mPreviousArm = angles == null ? "NPI" : FORMATTER.format(mArmAngle);
+        }
+
+        String servo1 = "Antebrazo: " + mPreviousForeArm;
+        String servo2 = "Brazo: " + mPreviousArm;
+        if (angles != null && mAngleListener != null && mRefresh) {
+            mAngleListener.onAnglesChanged(mForearmAngle, mArmAngle, mHandTween.currentAngle);
         }
         canvas.drawText(servo1, PADDING, mTextPaint.measureText("Xy"), mTextPaint);
         canvas.drawText(servo2, PADDING, mTextPaint.measureText("Xy") * 2, mTextPaint);
         canvas.translate(-boxX, -boxY);
 
+        // draw hand switcher
+        if (mRaised) {
+            canvas.drawBitmap(mRaisedHand, getMeasuredWidth() / 2 - mRaisedHand.getWidth() / 2,
+                    getMeasuredHeight() - mRaisedHand.getHeight(), null);
+        } else {
+            canvas.drawBitmap(mDownHand, getMeasuredWidth() / 2 - mDownHand.getWidth() / 2,
+                    getMeasuredHeight() - mDownHand.getHeight(), null);
+        }
+    }
+
+    private class HandTween implements Tweenable {
+
+        private float currentAngle = 0;
+
+        @Override
+        public int getTweenValues(int i, float[] floats) {
+            floats[1] = currentAngle;
+            return 2;
+        }
+
+        @Override
+        public void onTweenUpdated(int i, float[] floats) {
+            currentAngle = floats[1];
+            if (mAngleListener != null) {
+                mAngleListener.onAnglesChanged(mForearmAngle, mArmAngle, mHandTween.currentAngle);
+            }
+        }
     }
 
     private int calcOriginY() {
@@ -179,16 +260,39 @@ public class ArmView extends View {
             case MotionEvent.ACTION_DOWN:
                 return true;
             case MotionEvent.ACTION_MOVE:
+                if (clickedHand(event.getX(), event.getY())) {
+                    return false;
+                }
                 mClickX = event.getX();
                 mClickY = event.getY();
                 int auxiliarDrawAreaY = calcOriginY() + calcArmSize() + PADDING;
                 if (mClickY > auxiliarDrawAreaY) {
                     mClickY -= auxiliarDrawAreaY;
                 }
+                mRefresh = true;
                 invalidate();
+                return true;
+            case MotionEvent.ACTION_UP:
+                if (clickedHand(event.getX(), event.getY())) {
+                    mRaised = !mRaised;
+                    mTweenManager.clear();
+                    int to = mRaised ? 0 : 180;
+                    float diff = Math.abs(mHandTween.currentAngle - to);
+                    Tween.to(mHandTween, 0, (int) (diff * 2000 / 180), Linear.INOUT)
+                            .target(0, to)
+                            .addToManager(mTweenManager);
+                    mRefresh = false;
+                    invalidate();
+                }
                 return true;
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    private boolean clickedHand(float x, float y) {
+        int xPos = getMeasuredWidth() / 2 - mRaisedHand.getWidth() / 2;
+        int yPos = getMeasuredHeight() - mRaisedHand.getHeight();
+        return x > xPos && x < xPos + mRaisedHand.getWidth() && y > yPos;
     }
 
     private void drawLine(Canvas canvas, int x, int y, int length, float angle) {
