@@ -23,7 +23,7 @@ import java.text.DecimalFormat;
  * @author cristian
  */
 public class ArmView extends View {
-    private final int mOriginArmAngle = -90;
+    private static final int ORIGIN_ARM_ANGLE = -90;
     private static final int PADDING = 10;
 
     private static final DecimalFormat FORMATTER = new DecimalFormat("#.#\u00ba");
@@ -153,7 +153,7 @@ public class ArmView extends View {
 
         int elbowX = (int) (Math.cos(Math.toRadians(mForearmAngle)) * armSize);
         int elbowY = (int) (Math.sin(Math.toRadians(mForearmAngle)) * armSize);
-        drawLine(canvas, originX + elbowX, originY - elbowY, armSize, mForearmAngle + mArmAngle + mOriginArmAngle);
+        drawLine(canvas, originX + elbowX, originY - elbowY, armSize, mForearmAngle + mArmAngle + ORIGIN_ARM_ANGLE);
 
         // draw area again :P
         int auxiliarAreaY = originY + armSize + PADDING;
@@ -180,8 +180,8 @@ public class ArmView extends View {
         canvas.translate(boxX, boxY);
         canvas.drawRoundRect(rect, 15, 15, mBoxPaint);
         if (mRefresh && angles != null) {
-            mPreviousForeArm = angles == null ? "NPI" : FORMATTER.format(mForearmAngle);
-            mPreviousArm = angles == null ? "NPI" : FORMATTER.format(mArmAngle);
+            mPreviousForeArm = FORMATTER.format(mForearmAngle);
+            mPreviousArm = FORMATTER.format(mArmAngle);
         }
 
         String servo1 = "Antebrazo: " + mPreviousForeArm;
