@@ -65,6 +65,7 @@ public class ArmView extends View {
         mArmPaint.setStrokeCap(Paint.Cap.ROUND);
 
         mClickPaint = new Paint(mArmPaint);
+//        mClickPaint.setStrokeWidth(1);
         mClickPaint.setColor(Color.RED);
 
         mAreaPaint = new Paint(mArmPaint);
@@ -110,8 +111,9 @@ public class ArmView extends View {
 
         drawArea(canvas);
 
+        boolean insideWorkingArea = insideWorkingArea(mClickX, mClickY);
         if (mRefresh) {
-            mRefresh = insideWorkingArea(mClickX, mClickY);
+            mRefresh = insideWorkingArea;
             if (!mRefresh) {
                 performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
             }
@@ -164,13 +166,11 @@ public class ArmView extends View {
 
         // draw point
         if (mClickY < auxiliarAreaY && mClickX > 0 && mClickY > 0) {
-            if (mRefresh || (mPointX == 0 && mPointY == 0)) {
+            if ((mRefresh && angles != null) || (mPointX == 0 && mPointY == 0)) {
                 mPointX = mClickX;
                 mPointY = mClickY;
             }
-            if (insideWorkingArea(mPointX, mPointY)) {
-                canvas.drawPoint(mPointX, mPointY, mClickPaint);
-            }
+            canvas.drawPoint(mPointX, mPointY, mClickPaint);
         }
 
         // draw text container
@@ -179,7 +179,7 @@ public class ArmView extends View {
         float boxY = originY + PADDING;
         canvas.translate(boxX, boxY);
         canvas.drawRoundRect(rect, 15, 15, mBoxPaint);
-        if (mRefresh) {
+        if (mRefresh && angles != null) {
             mPreviousForeArm = angles == null ? "NPI" : FORMATTER.format(mForearmAngle);
             mPreviousArm = angles == null ? "NPI" : FORMATTER.format(mArmAngle);
         }
@@ -204,12 +204,37 @@ public class ArmView extends View {
     }
 
     private boolean insideWorkingArea(float x, float y) {
+        // check whether it is inside the inner circle
         float centerX = getWidth() / 2;
         int armSize = calcArmSize();
         float centerY = PADDING + armSize * 2;
         double innerRadius = Math.sqrt(2 * Math.pow(armSize, 2));
         boolean insideInnerCircle = Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) < Math.pow(innerRadius, 2);
-        return !insideInnerCircle;
+
+        // now check whether it is outside the arcs
+        int rightAreaX = getWidth() - PADDING - armSize;
+        int rightAreaY = PADDING + armSize * 2;
+        boolean insideRightArea = true;
+        if (x > rightAreaX && y > rightAreaY) {
+            insideRightArea = Math.pow(x - rightAreaX, 2) + Math.pow(y - rightAreaY, 2) < Math.pow(armSize, 2);
+        }
+
+        int leftAreaX = PADDING + armSize;
+        int leftAreaY = PADDING + armSize * 2;
+        boolean insideLeftArea = true;
+        if (x < leftAreaX && y > leftAreaY) {
+            insideLeftArea = Math.pow(x - leftAreaX, 2) + Math.pow(y - leftAreaY, 2) < Math.pow(armSize, 2);
+        }
+
+        // now check whether it is inside big arc
+        int mainAreaX = PADDING + armSize * 2;
+        int mainAreaY = PADDING + armSize * 2;
+        boolean insideMainArea = true;
+        if (y < mainAreaY) {
+            insideMainArea = Math.pow(x - mainAreaX, 2) + Math.pow(y - mainAreaY, 2) < Math.pow(armSize * armSize, 2);
+        }
+
+        return !insideInnerCircle && insideRightArea && insideLeftArea && insideMainArea;
     }
 
     private class HandTween implements Tweenable {
@@ -247,14 +272,14 @@ public class ArmView extends View {
 
         RectF leftArea = new RectF(0, 0, armSize * 2, armSize * 2);
         int leftAreaX = PADDING;
-        int leftAreaY = PADDING + armSize * 2 - armSize;
+        int leftAreaY = PADDING + armSize;
         canvas.translate(leftAreaX, leftAreaY);
         canvas.drawArc(leftArea, 90, 90, true, mAreaPaint);
         canvas.translate(-leftAreaX, -leftAreaY);
 
         RectF rightArea = new RectF(0, 0, armSize * 2, armSize * 2);
         int rightAreaX = getWidth() - PADDING - armSize * 2;
-        int rightAreaY = PADDING + armSize * 2 - armSize;
+        int rightAreaY = PADDING + armSize;
         canvas.translate(rightAreaX, rightAreaY);
         canvas.drawArc(rightArea, 0, 90, true, mAreaPaint);
         canvas.translate(-rightAreaX, -rightAreaY);
