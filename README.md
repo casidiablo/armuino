@@ -47,11 +47,11 @@ Arduino board must run this sketch:
         if (len > 0) {
           if (msg[0] == MOVE_MSG) {
             int howMuch = msg[2];
-            if (msg[1] == 11){
+            if (msg[1] == FOREARM){
               foreArm.write(howMuch);
-            } else if (msg[1] == 12){
+            } else if (msg[1] == ARM){
               arm.write(howMuch);
-            } else if (msg[1] == 13){
+            } else if (msg[1] == HAND){
               hand.write(howMuch);
             }
           }
