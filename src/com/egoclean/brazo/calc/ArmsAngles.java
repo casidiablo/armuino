@@ -14,11 +14,11 @@ public class ArmsAngles {
         this.armAngle = armAngle;
     }
 
-    public float getForeArmAngleRadians() {
+    float getForeArmAngleRadians() {
         return foreArmAngle;
     }
 
-    public float getArmAngleRadians() {
+    float getArmAngleRadians() {
         return armAngle;
     }
 

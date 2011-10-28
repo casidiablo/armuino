@@ -27,7 +27,7 @@ import android.util.Log;
  */
 public final class UsbAccessoryActivity extends Activity {
 
-	static final String TAG = "UsbAccessoryActivity";
+	private static final String TAG = "UsbAccessoryActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

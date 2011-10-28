@@ -8,9 +8,9 @@ import com.egoclean.brazo.ui.widget.ArmView;
  */
 public class OutputController implements ArmView.AngleListener {
 
-    private ServoController mForeArm;
-    private ServoController mArm;
-    private ServoController mHand;
+    private final ServoController mForeArm;
+    private final ServoController mArm;
+    private final ServoController mHand;
 
     public OutputController(ArmActivity armActivity) {
         mForeArm = new ServoController(armActivity, 1);

@@ -28,14 +28,14 @@ public class ArmActivity extends FragmentActivity {
     private PendingIntent mPermissionIntent;
     private boolean mPermissionRequestPending;
 
-    UsbAccessory mAccessory;
-    ParcelFileDescriptor mFileDescriptor;
-    FileInputStream mInputStream;
-    FileOutputStream mOutputStream;
+    private UsbAccessory mAccessory;
+    private ParcelFileDescriptor mFileDescriptor;
+    private FileInputStream mInputStream;
+    private FileOutputStream mOutputStream;
 
-    public static final byte LED_SERVO_COMMAND = 2;
+    private static final byte LED_SERVO_COMMAND = 2;
 
-    OutputController outputController;
+    private OutputController outputController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -118,12 +118,12 @@ public class ArmActivity extends FragmentActivity {
         }
     }
 
-    public void sendCommand(byte command, byte target, int value) {
+    public void sendCommand(byte target, int value) {
         byte[] buffer = new byte[3];
         if (value > 255)
             value = 255;
 
-        buffer[0] = command;
+        buffer[0] = ArmActivity.LED_SERVO_COMMAND;
         buffer[1] = target;
         buffer[2] = (byte) value;
         if (mOutputStream != null && buffer[1] != -1) {

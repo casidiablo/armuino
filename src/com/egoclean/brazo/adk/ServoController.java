@@ -2,9 +2,9 @@ package com.egoclean.brazo.adk;
 
 import com.egoclean.brazo.ui.ArmActivity;
 
-public class ServoController {
+class ServoController {
 	private final byte mCommandTarget;
-	private ArmActivity mActivity;
+	private final ArmActivity mActivity;
 
 	public ServoController(ArmActivity activity, int servoNumber) {
 		mActivity = activity;
@@ -12,6 +12,6 @@ public class ServoController {
 	}
 
 	public void changePosition(double value) {
-		mActivity.sendCommand(ArmActivity.LED_SERVO_COMMAND, mCommandTarget, (int) value);
+		mActivity.sendCommand(mCommandTarget, (int) value);
 	}
 }

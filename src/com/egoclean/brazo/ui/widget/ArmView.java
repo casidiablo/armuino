@@ -40,21 +40,21 @@ public class ArmView extends View {
 
     private int mForearmAngle = 90;
     private int mArmAngle = 90;
-    private HandTween mHandTween;
+    private final HandTween mHandTween;
 
     private AngleListener mAngleListener;
 
     private boolean mRaised = true;
     private boolean mRefresh = true;
-    private Bitmap mRaisedHand;
-    private Bitmap mDownHand;
+    private final Bitmap mRaisedHand;
+    private final Bitmap mDownHand;
 
     private String mPreviousForeArm;
     private String mPreviousArm;
 
     private float mPointX;
     private float mPointY;
-    private TweenManager mTweenManager;
+    private final TweenManager mTweenManager;
 
     public ArmView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -92,7 +92,7 @@ public class ArmView extends View {
         mTickHandler.sendMessage(Message.obtain());
     }
 
-    private Handler mTickHandler = new Handler() {
+    private final Handler mTickHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
