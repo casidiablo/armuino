@@ -1,12 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<!--
+  ~ DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+  ~                     Version 2, December 2004
+  ~
+  ~  Copyright (C) 2011 Cristian Castiblanco <cristian@elhacker.net>
+  ~
+  ~  Everyone is permitted to copy and distribute verbatim or modified
+  ~  copies of this license document, and changing it is allowed as long
+  ~  as the name is changed.
+  ~
+  ~             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+  ~    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+  ~
+  ~   0. You just DO WHAT THE FUCK YOU WANT TO.
+  -->
+
+<RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
-    <fragment
-            android:name="com.egoclean.brazo.ui.BrazoFragment"
+    <com.egoclean.brazo.ui.widget.ArmView
+            android:id="@+id/arm_view"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"/>
-</LinearLayout>
-
+            android:layout_height="fill_parent"
+            android:background="#cccccc"/>
+    <TextView
+            android:id="@+id/lnl_not_connected"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:clickable="true"
+            android:textSize="40dip"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:background="#aa000000"
+            android:text="@string/not_connected"/>
+</RelativeLayout>

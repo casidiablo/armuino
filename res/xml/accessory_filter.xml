@@ -16,6 +16,5 @@
   -->
 
 <resources>
-    <string name="app_name">Brazo</string>
-    <string name="not_connected">Device is currently not connected to the Arduino board</string>
+    <usb-accessory manufacturer="egoclean" model="arm" version="1.0" />
 </resources>
