@@ -21,11 +21,6 @@ public class OutputController implements ArmView.AngleListener {
     @Override
     public void onAnglesChanged(float foreArm, float arm, float hand) {
         mForeArm.changePosition(foreArm);
-        // 180 - 0 -> 180
-        // 180 - 45 -> 135
-        // 180 - 90 -> 90
-        // 180 - 135 -> 45
-        // 180 - 180 -> 0
         mArm.changePosition(180 - arm);
         mHand.changePosition(hand);
     }
