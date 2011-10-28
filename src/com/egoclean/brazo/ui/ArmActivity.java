@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
 import com.egoclean.brazo.R;
 import com.egoclean.brazo.adk.OutputController;
 import com.egoclean.brazo.ui.widget.ArmView;
@@ -36,6 +37,7 @@ public class ArmActivity extends FragmentActivity {
     private static final byte LED_SERVO_COMMAND = 2;
 
     private OutputController outputController;
+    private View mNotConnected;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,21 @@ public class ArmActivity extends FragmentActivity {
         setContentView(R.layout.main);
         ArmView armView = (ArmView) findViewById(R.id.arm_view);
         armView.setAngleListener(outputController);
+
+        mNotConnected = findViewById(R.id.lnl_not_connected);
+        if (mAccessory != null) {
+			showControls();
+		} else {
+			hideControls();
+		}
+    }
+
+    private void showControls() {
+        mNotConnected.setVisibility(View.GONE);
+    }
+
+    private void hideControls() {
+        mNotConnected.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -59,6 +76,7 @@ public class ArmActivity extends FragmentActivity {
         super.onResume();
 
         if (mInputStream != null && mOutputStream != null) {
+            showControls();
             return;
         }
 
@@ -101,12 +119,15 @@ public class ArmActivity extends FragmentActivity {
             mInputStream = new FileInputStream(fd);
             mOutputStream = new FileOutputStream(fd);
             Log.d(TAG, "accessory opened");
+            showControls();
         } else {
             Log.d(TAG, "accessory open fail");
+            hideControls();
         }
     }
 
     private void closeAccessory() {
+        hideControls();
         try {
             if (mFileDescriptor != null) {
                 mFileDescriptor.close();
