@@ -91,7 +91,7 @@ public class ArmView extends View {
         mTickHandler.sendMessage(Message.obtain());
     }
 
-    private Handler mTickHandler = new Handler(){
+    private Handler mTickHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -110,6 +110,12 @@ public class ArmView extends View {
 
         drawArea(canvas);
 
+        if (mRefresh) {
+            mRefresh = insideWorkingArea(mClickX, mClickY);
+            if (!mRefresh) {
+                performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            }
+        }
         ArmsAngles angles = InverseCinematic.calculateAngles(mClickX - getWidth() / 2, originY - mClickY, armSize);
         if (angles != null) {
             if (mRefresh) {
@@ -162,7 +168,9 @@ public class ArmView extends View {
                 mPointX = mClickX;
                 mPointY = mClickY;
             }
-            canvas.drawPoint(mPointX, mPointY, mClickPaint);
+            if (insideWorkingArea(mPointX, mPointY)) {
+                canvas.drawPoint(mPointX, mPointY, mClickPaint);
+            }
         }
 
         // draw text container
@@ -193,6 +201,15 @@ public class ArmView extends View {
             canvas.drawBitmap(mDownHand, getMeasuredWidth() / 2 - mDownHand.getWidth() / 2,
                     getMeasuredHeight() - mDownHand.getHeight(), null);
         }
+    }
+
+    private boolean insideWorkingArea(float x, float y) {
+        float centerX = getWidth() / 2;
+        int armSize = calcArmSize();
+        float centerY = PADDING + armSize * 2;
+        double innerRadius = Math.sqrt(2 * Math.pow(armSize, 2));
+        boolean insideInnerCircle = Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) < Math.pow(innerRadius, 2);
+        return !insideInnerCircle;
     }
 
     private class HandTween implements Tweenable {
