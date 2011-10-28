@@ -72,5 +72,12 @@ In order to be able to run sketch above, you must:
 
 - Have an Arduino Mega for Android or an Arduino UNO with a USB shield
 - Follow [these steps][1] in order to install ADK libraries for Arduino
+- Also, your Android device should support accessory mode. Usually, any Android 3.2 device is able to do so; Android 2.3.4 devices can do this via [add-on library][2].
+
+About this
+==========
+
+This is just my homework. It is also under the WTFPL public license, so you can do whatever you want with this. If you want to get in touch with me, please drop me an email: cristian@elhacker.net
 
   [1]: http://developer.android.com/guide/topics/usb/adk.html
+  [2]: http://developer.android.com/guide/topics/usb/accessory.html#manifest
